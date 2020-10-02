@@ -1,5 +1,5 @@
 {
-    "name": "vectorface/cc-icons",
+    "name": "vectorface/CCIcons",
     "description": "Generate CC icon combinations for umbrella processors",
     "type": "library",
     "license": "MIT",
@@ -8,8 +8,8 @@
     ],
     "autoload": {
         "psr-4": {
-            "Vectorface\\CC-Icons\\": "src",
-            "Vectorface\\Tests\\CC-Icons\\": "tests"
+            "Vectorface\\CCIcons\\": "src",
+            "Vectorface\\Tests\\CCIcons\\": "tests"
         }
     },
     "require": {
