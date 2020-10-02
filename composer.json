@@ -1,0 +1,23 @@
+{
+    "name": "vectorface/cc-icons",
+    "description": "Generate CC icon combinations for umbrella processors",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        { "name":  "N. Tuttle" }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Vectorface\\CC-Icons\\": "src",
+            "Vectorface\\Tests\\CC-Icons\\": "tests"
+        }
+    },
+    "require": {
+        "php": ">=7.3.0",
+        "intervention/image": "^2.5"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^9.0.0",
+        "friendsofphp/php-cs-fixer": "^2.15"
+    }
+}
