@@ -1,6 +1,6 @@
 {
-    "name": "vectorface/CCIcons",
-    "description": "Generate CC icon combinations for umbrella processors",
+    "name": "vectorface/cc-icons",
+    "description": "Generates an image based on a list of supported credit card types",
     "type": "library",
     "license": "MIT",
     "authors": [
