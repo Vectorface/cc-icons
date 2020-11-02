@@ -84,7 +84,8 @@ class CCImageMakerTest extends TestCase
         $imagick->readImageBlob(file_get_contents($generated));
         $this->assertImageSimilarity(
             $imagick,
-            __DIR__ . '/images/' . $compareImg
+            __DIR__ . '/images/' . $compareImg,
+            0.00001
         );
     }
 
