@@ -1,6 +1,9 @@
 /.idea/
 /coverage/
+/tests/tmp/*
+!/tests/tmp/.gitkeep
 /vendor/
 /composer.lock
 /composer.phar
 /.php_cs.cache
+/.phpunit.result.cache
