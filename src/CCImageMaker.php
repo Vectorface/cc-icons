@@ -12,11 +12,15 @@ class CCImageMaker
     /** @var array */
     private $processors;
     /** @var int */
-    private $padding, $width, $height;
+    private $padding;
+    /** @var int */
+    private $width;
+    /** @var int */
+    private $height;
     /** @var Image */
     private $img;
 
-    /* Give every supported CC a constant to reference */
+    /* Give every CC icon a constant to reference */
     const AMEX = 1;
     const DANKORT = 2;
     const DINERSCLUB = 3;
@@ -28,18 +32,36 @@ class CCImageMaker
     const UNIONPAY = 9;
     const VISA = 10;
 
+    /** Link supported CC string representations to constants */
+    protected static $cc_strings = [
+        "VISA"       => self::VISA,
+        "MASTERCARD" => self::MASTERCARD,
+        "MC"         => self::MASTERCARD,
+        "DISCOVER"   => self::DISCOVER,
+        "UKE"        => self::VISA,         // Short for UK Electron / Visa Electron
+        "SWITCH"     => self::MAESTRO,      // Rebranded as Maestro in 2002
+        "SOLO"       => self::MAESTRO,      // Discontinued in 2011, used the Maestro processing system
+        "DINERSCLUB" => self::DINERSCLUB,
+        "DANKORT"    => self::DANKORT,      // National debit card of Denmark
+        "DELTA"      => self::VISA,         // Rebranded as Visa Debit
+        "AMEX"       => self::AMEX,
+        "JCB"        => self::JCB,
+        "UNIONPAY"   => self::UNIONPAY,
+        "POSTEPAY"   => self::POSTEPAY      // Italian Post Office
+    ];
+
     /** Link credit cards to their file name in src/icons/ */
     protected static $supported_cc_types = [
-        self::AMEX => "amex",
-        self::DANKORT => "dankort",
+        self::AMEX       => "amex",
+        self::DANKORT    => "dankort",
         self::DINERSCLUB => "dinersclub",
-        self::DISCOVER => "discover",
-        self::JCB => "jcb",
-        self::MAESTRO => "maestro",
+        self::DISCOVER   => "discover",
+        self::JCB        => "jcb",
+        self::MAESTRO    => "maestro",
         self::MASTERCARD => "mastercard",
-        self::POSTEPAY => "postepay",
-        self::UNIONPAY => "unionpay",
-        self::VISA => "visa"
+        self::POSTEPAY   => "postepay",
+        self::UNIONPAY   => "unionpay",
+        self::VISA       => "visa"
     ];
 
     /** Width/height of the icon files in src/icons, must be divisible by 4 */
@@ -47,14 +69,15 @@ class CCImageMaker
 
     /**
      * CCImageMaker constructor.
+     * @param bool $useGd Set to true to use GD instead of Imagick
      */
-    public function __construct()
+    public function __construct(bool $useGd = false)
     {
-        if (extension_loaded('imagick') && class_exists(\Imagick::class)) {
-            // Prefer to use ImageMagick if available
+        if (extension_loaded('imagick') && class_exists(\Imagick::class) && !$useGd) {
+            // Use Imagick by default if available
             $this->manager = new ImageManager(['driver' => 'imagick']);
         } else {
-            // Fall back to GD if not present
+            // Fall back to GD if Imagick not present or otherwise specified
             $this->manager = new ImageManager();
         }
         $this->processors = [];
@@ -62,19 +85,27 @@ class CCImageMaker
     }
 
     /**
-     * Add a list of processors to be included in the image
-     * @param array $new_processors The new processors to be included
+     * Specify the list of processors to be included in the image, can use either the processor's constant or a
+     * string representation.
+     * @param array $processors The new processors to be included
      * @return $this
      */
-    public function withTypes(array $new_processors)
+    public function withTypes(array $processors)
     {
-        // Remove unsupported entries
-        $filtered_processors = array_filter($new_processors, function ($processor) {
-            return array_key_exists($processor, self::$supported_cc_types);
+        // Remove unsupported entries (not referencing a valid constant or string)
+        $filtered_processors = array_filter($processors, function ($processor) {
+            return isset(self::$supported_cc_types[$processor])
+                || (is_string($processor) && isset(self::$cc_strings[strtoupper($processor)]));
         });
 
+        foreach ($filtered_processors as $i => $processor) {
+            if (is_string($processor)) {
+                $filtered_processors[$i] = self::$cc_strings[strtoupper($processor)];
+            }
+        }
+
         // Discard processors if more than 6
-        $this->processors = array_slice(array_merge($this->processors, $filtered_processors), 0, 6);
+        $this->processors = array_slice($filtered_processors, 0, 6);
         return $this;
     }
 
@@ -115,13 +146,13 @@ class CCImageMaker
     }
 
     /**
-     * Get the image as a PNG encoded string
+     * Get the image as a RFC 2397 encoded string
      * @return string
      */
     public function getDataUri()
     {
         $this->makeImage();
-        return (string)$this->img;
+        return (string)$this->img->encode('data-url');
     }
 
 
