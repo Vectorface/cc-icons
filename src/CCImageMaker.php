@@ -37,6 +37,7 @@ class CCImageMaker
         "VISA"       => self::VISA,
         "MASTERCARD" => self::MASTERCARD,
         "MC"         => self::MASTERCARD,
+        "MAESTRO"    => self::MAESTRO,
         "DISCOVER"   => self::DISCOVER,
         "UKE"        => self::VISA,         // Short for UK Electron / Visa Electron
         "SWITCH"     => self::MAESTRO,      // Rebranded as Maestro in 2002
