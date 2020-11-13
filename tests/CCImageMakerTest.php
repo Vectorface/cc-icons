@@ -66,6 +66,13 @@ class CCImageMakerTest extends TestCase
                 'wide.png',
                 [CCImageMaker::MAESTRO, CCImageMaker::UNIONPAY, CCImageMaker::VISA, CCImageMaker::MASTERCARD],
                 [300, 100]
+            ],
+            [
+                'layout.png',
+                [CCImageMaker::VISA, CCImageMaker::MASTERCARD, CCImageMaker::MAESTRO],
+                [400, 200],
+                10,
+                [3]
             ]
         ];
     }
@@ -73,12 +80,13 @@ class CCImageMakerTest extends TestCase
     /**
      * @dataProvider makeImageProvider
      */
-    public function testMakeImage(string $compareImg, array $types, array $size = [300, 200], int $padding = 10)
+    public function testMakeImage(string $compareImg, array $types, array $size = [300, 200], int $padding = 10, array $layout = [])
     {
         $generated = (new CCImageMaker)
             ->withTypes($types)
             ->withSize($size[0], $size[1])
             ->withPadding($padding)
+            ->withLayout($layout)
             ->getDataUri();
         $imagick = new Imagick();
         $imagick->readImageBlob(file_get_contents($generated));
