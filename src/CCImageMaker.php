@@ -19,6 +19,8 @@ class CCImageMaker
     private $height;
     /** @var Image */
     private $img;
+    /** @var array */
+    private $layout;
 
     /* Give every CC icon a constant to reference */
     const AMEX = 1;
@@ -68,6 +70,19 @@ class CCImageMaker
     /** Width/height of the icon files in src/icons, must be divisible by 4 */
     const ICON_SIZE = 200;
 
+    /** The default amount of padding used with the default layout */
+    const DEFAULT_PADDING = 10;
+
+    /** The default layout to be used, indexed by number of icons */
+    const DEFAULT_LAYOUT = [
+        1 => [1],
+        2 => [2],
+        3 => [2, 1],
+        4 => [2, 2],
+        5 => [3, 2],
+        6 => [3, 3],
+    ];
+
     /**
      * CCImageMaker constructor.
      * @param bool $useGd Set to true to use GD instead of Imagick
@@ -81,8 +96,12 @@ class CCImageMaker
             // Fall back to GD if Imagick not present or otherwise specified
             $this->manager = new ImageManager();
         }
+
+        $this->width = 3 / 2 * self::ICON_SIZE;
+        $this->height = self::ICON_SIZE;
         $this->processors = [];
-        $this->padding = 10;
+        $this->padding = self::DEFAULT_PADDING;
+        $this->layout = [];
     }
 
     /**
@@ -135,6 +154,17 @@ class CCImageMaker
     }
 
     /**
+     * Specify the number of icons to place on each row. For an image with 1-2-1 icons on each row, use [1, 2, 1]
+     * @param array $layout The icon layout to use
+     * @return $this
+     */
+    public function withLayout(array $layout)
+    {
+        $this->layout = $layout;
+        return $this;
+    }
+
+    /**
      * Save the image to a specified location on disk
      * @param string $path The location to save the image
      * @return $this
@@ -166,113 +196,64 @@ class CCImageMaker
             $this->processors = [self::MASTERCARD, self::VISA];
         }
 
-        // Create a 3:2 canvas proportional to icon size, including padding
-        $this->img = $this->manager->canvas(
-            3 / 2 * self::ICON_SIZE + 2 * $this->padding,
-            self::ICON_SIZE + $this->padding
+        $this->img = $this->manager->canvas($this->width, $this->height);
+        // Use default layout if none specified
+        $layout = empty($this->layout) ? self::DEFAULT_LAYOUT[count($this->processors)] : $this->layout;
+
+        // Height is (total height - total padding) / number of rows
+        $row_height = ($this->height - (count($layout) - 1) * $this->padding) / count($layout);
+        // Padding is (total height - total padding - total row height) / 2
+        $top_padding = ($this->height - (count($layout) * ($row_height + $this->padding) - $this->padding)) / 2;
+
+        // Get scaled icon size to fit all icons in a row size $this->width x $row_height
+        $max_icons = max($layout);
+        $icon_size = min(
+            ($this->width - ($max_icons - 1) * $this->padding) / $max_icons,
+            $row_height
         );
 
-        $processor_count = count($this->processors);
-        switch ($processor_count) {
-            case 1:
-                // Insert image in middle of canvas
-                $this->img->insert(self::getIconPath($this->processors[0]), 'center');
-                break;
-            case 2:
-                // Scale icons to 0.75x and insert them on edges of canvas
-                foreach ($this->processors as $i => $processor) {
-                    $processor_icon = $this->manager->make(self::getIconPath($processor));
-                    $processor_icon->widen(3 / 4 * self::ICON_SIZE);
-                    // Offset second icon to right side of image
-                    $this->img->insert($processor_icon, 'left', $i * ($this->img->getWidth() / 2 + $this->padding));
-                }
-                break;
-            case 3:
-            case 4:
-            case 5:
-            case 6:
-                // Make top and bottom rows separately, then merge them together
-                $top_icon_count = (int)round($processor_count / 2);
-
-                $top_row = $this->makeRow(array_slice($this->processors, 0, $top_icon_count));
-                $bottom_row = $this->makeRow(array_slice($this->processors, $top_icon_count, $processor_count - $top_icon_count));
-
-                $this->img->insert($top_row, 'top');
-                $this->img->insert($bottom_row, 'bottom');
-                break;
-        }
-
-        // Resize output if both width and height parameters are present
-        if (isset($this->width) && isset($this->height)) {
-            $this->resizeImage();
+        $processors_added = 0;
+        foreach ($layout as $i => $count) {
+            $row = $this->makeRow(
+                array_slice($this->processors, $processors_added, $count),
+                $row_height,
+                round($icon_size)
+            );
+            // Offset from top by padding amount + $i * (row height + padding)
+            $this->img->insert($row, 'top-center', 0, round($top_padding + $i * ($this->padding + $row_height)));
+            $processors_added += $count;
         }
     }
 
     /**
      * Creates an image containing one row of processor icons
-     * @param array $processors List of processors to be included, max of 3
+     * @param array $processors List of processors to be included
+     * @param int $row_height The height of the row
+     * @param int $icon_size The size of icons to insert
      * @return Image
      */
-    private function makeRow(array $processors)
+    private function makeRow(array $processors, int $row_height, int $icon_size)
     {
-        // Scale padding to account for resize at end
-        $adjusted_padding = 2 * $this->padding;
-        $row = $this->manager->canvas(3 * self::ICON_SIZE + 2 * $adjusted_padding, self::ICON_SIZE);
+        $row = $this->manager->canvas($this->width, $row_height);
 
-        switch (count($processors)) {
-            case 1:
-                // Insert image in middle of row
-                $row->insert(
-                    $this->getIconPath($processors[0]),
-                    'top-left',
-                    $row->getWidth() / 2 - self::ICON_SIZE / 2
-                );
-                break;
-            case 2:
-                // Centre images with 2 * $adjusted_padding between them
-                $row->insert(
-                    $this->getIconPath($processors[0]),
-                    'top-left',
-                    $row->getWidth() / 2 - self::ICON_SIZE - $adjusted_padding
-                );
-                $row->insert(
-                    $this->getIconPath($processors[1]),
-                    'top-left',
-                    $row->getWidth() / 2 + $adjusted_padding
-                );
-                break;
-            case 3:
-                // Insert all 3 images equally spaced
-                foreach ($processors as $i => $processor) {
-                    // Offset determined by index in array
-                    $row->insert(
-                        $this->getIconPath($processor),
-                        'top-left',
-                        $i * (self::ICON_SIZE + $adjusted_padding)
-                    );
-                }
-                break;
+        // Divide available width evenly among icons as long as they are shorter than the row height
+        $processor_count = count($processors);
+
+        // Padding on either side of the row of icons
+        $left_padding = ($this->width - ($processor_count * ($icon_size + $this->padding) - $this->padding)) / 2;
+
+        foreach ($processors as $i => $processor) {
+            $processor_icon = $this->manager->make($this->getIconPath($processor));
+            $processor_icon->widen($icon_size);
+            // Offset from left by padding amount + $i * (size of icon + padding)
+            $row->insert(
+                $processor_icon,
+                'left',
+                round($left_padding + $i * ($icon_size + $this->padding))
+            );
         }
 
-        // Resize row to proper size
-        $row->widen($row->getWidth() / 2);
         return $row;
-    }
-
-    /**
-     * Resizes the image to the proper size while constraining aspect ratio
-     */
-    private function resizeImage()
-    {
-        $width_ratio = $this->width / $this->img->getWidth();
-        $height_ratio = $this->height / $this->img->getHeight();
-        
-        if ($width_ratio > $height_ratio) {
-            $this->img->heighten($this->height);
-        } else {
-            $this->img->widen($this->width);
-        }
-        $this->img->resizeCanvas($this->width, $this->height);
     }
 
     /**

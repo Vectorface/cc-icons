@@ -54,13 +54,13 @@ class CCImageMakerTest extends TestCase
             [
                 'padding.png',
                 [CCImageMaker::DISCOVER, CCImageMaker::MASTERCARD, CCImageMaker::VISA],
-                [350, 225],
+                [300, 200],
                 25
             ],
             [
                 'tall.png',
                 [CCImageMaker::DINERSCLUB, CCImageMaker::DISCOVER, CCImageMaker::JCB],
-                [300, 300]
+                [300, 400]
             ],
             [
                 'wide.png',
@@ -73,7 +73,7 @@ class CCImageMakerTest extends TestCase
     /**
      * @dataProvider makeImageProvider
      */
-    public function testMakeImage(string $compareImg, array $types, array $size = [320, 210], int $padding = 10)
+    public function testMakeImage(string $compareImg, array $types, array $size = [300, 200], int $padding = 10)
     {
         $generated = (new CCImageMaker)
             ->withTypes($types)

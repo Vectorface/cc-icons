@@ -1,7 +1,5 @@
 /.idea/
 /coverage/
-/tests/tmp/*
-!/tests/tmp/.gitkeep
 /vendor/
 /composer.lock
 /composer.phar

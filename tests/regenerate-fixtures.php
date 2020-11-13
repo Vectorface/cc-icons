@@ -17,12 +17,12 @@ $regular_images = [
 $special_images = [
     'padding' => [
         'types'   => ['DISCOVER', 'MASTERCARD', 'VISA'],
-        'size'    => [350, 225],
+        'size'    => [300, 200],
         'padding' => 25
     ],
     'tall'    => [
         'types'   => ['DINERSCLUB', 'DISCOVER', 'JCB'],
-        'size'    => [300, 300],
+        'size'    => [300, 400],
         'padding' => 10
     ],
     'wide'    => [
