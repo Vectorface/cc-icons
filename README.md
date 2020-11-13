@@ -36,7 +36,7 @@ to the image that was created. By default, each image is
 - `withPadding(int $new_padding)` - Specify how much padding to include between icons
 - `withSize(int $width, int $height)` - Specify the size of the output image
 - `withLayout(array $layout)` - Specify how many icons to play on each row. This method
-does not check whether the number of icons in the layout matches the number
+does not check that the number of icons in the layout matches the number
 of icons desired.
 - `saveToDisk(string $path)` - Generate and save the image to the given location on disk
 - `getDataUri()` - Generate and get the RFC 2397 string corresponding to the image
