@@ -18,56 +18,55 @@ class CCImageMakerTest extends TestCase
     public function makeImageProvider()
     {
         return [
-            [
+            'invalid CC type returns empty' => [
                 'empty.png',
                 ['interac'] // Invalid CC id
             ],
-            [
+            'single AMEX icon' => [
                 '1-icon.png',
                 [CCImageMaker::AMEX]
             ],
-            [
+            'Mastercard and Diners Club icons' => [
                 '2-icon.png',
                 [CCImageMaker::MASTERCARD, CCImageMaker::DINERSCLUB]
             ],
-            [
+            'JCB, Mastercard, and Visa icons' => [
                 '3-icon.png',
                 [CCImageMaker::JCB, CCImageMaker::MASTERCARD, CCImageMaker::VISA]
             ],
-            [
+            'UnionPay, Discover, Maestro, and AMEX icons' => [
                 '4-icon.png',
                 [CCImageMaker::UNIONPAY, CCImageMaker::DISCOVER, CCImageMaker::MAESTRO, CCImageMaker::AMEX]
             ],
-            [
+            'Visa, Diners Club, AMEX, Discover, and UnionPay icons' => [
                 '5-icon.png',
                 [CCImageMaker::VISA, CCImageMaker::DINERSCLUB, CCImageMaker::AMEX, CCImageMaker::DISCOVER, CCImageMaker::UNIONPAY]
             ],
-            [
+            'Mastercard, JCB, Maestro, UnionPay, AMEX, and Discover icons' => [
                 '6-icon.png',
                 [CCImageMaker::MASTERCARD, CCImageMaker::JCB, CCImageMaker::MAESTRO, CCImageMaker::UNIONPAY, CCImageMaker::AMEX, CCImageMaker::DISCOVER]
             ],
-            // Use strings instead of constants
-            [
+            'JCB, Mastercard, and Visa icons using case-insensitive strings' => [
                 '3-icon.png',
                 ['JCB', 'Mc', 'vISa']
             ],
-            [
+            'Discover, Mastercard, and Visa using extra padding between icons' => [
                 'padding.png',
                 [CCImageMaker::DISCOVER, CCImageMaker::MASTERCARD, CCImageMaker::VISA],
                 [300, 200],
                 25
             ],
-            [
+            'Diners Club, Discover, and JCB creating a tall image' => [
                 'tall.png',
                 [CCImageMaker::DINERSCLUB, CCImageMaker::DISCOVER, CCImageMaker::JCB],
                 [300, 400]
             ],
-            [
+            'Maestro, UnionPay, Visa, and Mastercard creating a wide image' => [
                 'wide.png',
                 [CCImageMaker::MAESTRO, CCImageMaker::UNIONPAY, CCImageMaker::VISA, CCImageMaker::MASTERCARD],
                 [300, 100]
             ],
-            [
+            'Visa, Mastercard, and Maestro with a custom layout using 3 icons in a row' => [
                 'layout.png',
                 [CCImageMaker::VISA, CCImageMaker::MASTERCARD, CCImageMaker::MAESTRO],
                 [400, 200],
