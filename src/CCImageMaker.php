@@ -101,7 +101,7 @@ class CCImageMaker
         $this->height = self::ICON_SIZE;
         $this->processors = [];
         $this->padding = self::DEFAULT_PADDING;
-        $this->layout = [];
+        $this->layout = self::DEFAULT_LAYOUT;
     }
 
     /**
@@ -154,13 +154,20 @@ class CCImageMaker
     }
 
     /**
-     * Specify the number of icons to place on each row. For an image with 1-2-1 icons on each row, use [1, 2, 1]
-     * @param array $layout The icon layout to use
+     * Override one or more default layouts. Expects an array with keys corresponding to the layout to override.
+     *
+     * Example:
+     *
+     * [
+     *      4 => [1, 2, 1]
+     *      5 => [2, 3]
+     * ]
+     * @param array $override The icon layouts to use
      * @return $this
      */
-    public function withLayout(array $layout)
+    public function withLayout(array $override)
     {
-        $this->layout = $layout;
+        $this->layout = array_replace($this->layout, $override);
         return $this;
     }
 
@@ -198,7 +205,7 @@ class CCImageMaker
 
         $this->img = $this->manager->canvas($this->width, $this->height);
         // Use default layout if none specified
-        $layout = empty($this->layout) ? self::DEFAULT_LAYOUT[count($this->processors)] : $this->layout;
+        $layout = $this->layout[count($this->processors)];
 
         // Height is (total height - total padding) / number of rows
         $row_height = ($this->height - (count($layout) - 1) * $this->padding) / count($layout);

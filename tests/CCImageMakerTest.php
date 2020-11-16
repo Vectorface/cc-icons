@@ -72,7 +72,7 @@ class CCImageMakerTest extends TestCase
                 [CCImageMaker::VISA, CCImageMaker::MASTERCARD, CCImageMaker::MAESTRO],
                 [400, 200],
                 10,
-                [3]
+                [3 => [3]]
             ]
         ];
     }
