@@ -30,6 +30,7 @@
         "test": [
             "@test-unit"
         ],
-        "test-unit": "phpunit --color=always"
+        "test-unit": "phpunit --color=always --testdox",
+        "regenerate-fixtures": "php tests/regenerate-fixtures.php"
     }
 }
