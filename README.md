@@ -57,6 +57,13 @@ Icons should be specified as a single word, case-insensitive
 
 Layouts specify number of icons per row.
 
-| 1 | 2 | 3 | 4 | 5 | 6 |
-|---|---|---|---|---|---|
-| [1] | [2] | [2, 1] | [2, 2] | [3, 2] | [3, 3] |
+```php
+[
+    1 => [1],
+    2 => [2],
+    3 => [2, 1],
+    4 => [2, 2],
+    5 => [3, 2],
+    6 => [3, 3],
+]
+```
