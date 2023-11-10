@@ -72,7 +72,11 @@ class CCImageMakerTest extends TestCase
                 [400, 200],
                 10,
                 [3 => [3]]
-            ]
+            ],
+            'Cryptocurrencies LTC and BCH' => [
+                'cryptocurrencies.png',
+                [CCImageMaker::LTC, CCImageMaker::BCH],
+            ],
         ];
     }
 
