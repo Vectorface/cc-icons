@@ -2,7 +2,7 @@
 
 use Vectorface\CCIcons\CCImageMaker;
 
-require 'vendor/autoload.php';
+require __DIR__ . '/../vendor/autoload.php';
 
 $regular_images = [
     '1-icon'  => ['AMEX'],
@@ -11,7 +11,8 @@ $regular_images = [
     '4-icon'  => ['UNIONPAY', 'DISCOVER', 'MAESTRO', 'AMEX'],
     '5-icon'  => ['VISA', 'DINERSCLUB', 'AMEX', 'DISCOVER', 'UNIONPAY'],
     '6-icon'  => ['MASTERCARD', 'JCB', 'MAESTRO', 'UNIONPAY', 'AMEX', 'DISCOVER'],
-    'empty'   => []
+    'empty'   => [],
+    'cryptocurrencies' => ['LTC', 'BCH'],
 ];
 
 $special_images = [
@@ -38,7 +39,7 @@ $special_images = [
         'size'    => [400, 200],
         'padding' => 10,
         'layout'  => [3]
-    ]
+    ],
 ];
 
 foreach ($regular_images as $filename => $types) {

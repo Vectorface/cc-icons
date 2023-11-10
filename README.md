@@ -1,9 +1,9 @@
 # CC Icons
 
 This is a PHP class that generates an image based on a
-list of supported credit card types. It makes it easy to
-get an image showing all supported payment types for a
-payment processor.
+list of supported credit card or cryptocurrency types.
+It makes it easy to get an image showing all supported
+payment types for a payment processor.
 
 ## Installation
 
@@ -42,16 +42,26 @@ to the image that was created. By default, each image is
 ## List of Supported Icons
 
 Icons should be specified as a single word, case-insensitive
-- AMEX
-- Dankort
-- DinersClub
-- Discover
-- JCB
-- Maestro -- Aliases: `Switch`, `Solo`
-- Mastercard -- Alias: `MC`
-- PostePay
-- UnionPay
-- Visa -- Aliases: `Delta`, `UKE`
+- Credit Cards:
+    - `AMEX`
+    - `Dankort`
+    - `DinersClub`
+    - `Discover`
+    - `JCB`
+    - `Maestro` -- Aliases: `Switch`, `Solo`
+    - `Mastercard` -- Alias: `MC`
+    - `PostePay`
+    - `UnionPay`
+    - `Visa` -- Aliases: `Delta`, `UKE`
+- Cryptocurrencies:
+    - `BTC` (Bitcoin)
+    - `LTC` (Litecoin)
+    - `BCH` (Bitcoin Cash)
+    - `BNB` (Binance Coin)
+    - `ETH` (Ethereum)
+    - `USDT` (Tether)
+    - `USDC` (USD Coin)
+
 
 ## Default Layouts
 

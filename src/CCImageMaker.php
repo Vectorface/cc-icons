@@ -22,7 +22,7 @@ class CCImageMaker
     /** @var array */
     private $layout;
 
-    /* Give every CC icon a constant to reference */
+    /* Give every CC icon an ID to reference */
     const AMEX = 1;
     const DANKORT = 2;
     const DINERSCLUB = 3;
@@ -34,8 +34,18 @@ class CCImageMaker
     const UNIONPAY = 9;
     const VISA = 10;
 
+    /* Give every cryptocurrency icon an ID to reference */
+    const BTC = 1001;
+    const LTC = 1002;
+    const BCH = 1003;
+    const BNB = 1004;
+    const ETH = 1005;
+    const USDT = 1006;
+    const USDC = 1007;
+
     /** Link supported CC string representations to constants */
     protected static $cc_strings = [
+        // Credit Cards
         "VISA"       => self::VISA,
         "MASTERCARD" => self::MASTERCARD,
         "MC"         => self::MASTERCARD,
@@ -50,11 +60,21 @@ class CCImageMaker
         "AMEX"       => self::AMEX,
         "JCB"        => self::JCB,
         "UNIONPAY"   => self::UNIONPAY,
-        "POSTEPAY"   => self::POSTEPAY      // Italian Post Office
+        "POSTEPAY"   => self::POSTEPAY,      // Italian Post Office
+
+        // Cryptocurrencies
+        "BTC"        => self::BTC,
+        "LTC"        => self::LTC,
+        "BCH"        => self::BCH,
+        "BNB"        => self::BNB,
+        "ETH"        => self::ETH,
+        "USDT"       => self::USDT,
+        "USDC"       => self::USDC,
     ];
 
-    /** Link credit cards to their file name in src/icons/ */
+    /** Link IDs to their file name in src/icons/ */
     protected static $supported_cc_types = [
+        // Credit Cards
         self::AMEX       => "amex",
         self::DANKORT    => "dankort",
         self::DINERSCLUB => "dinersclub",
@@ -64,7 +84,16 @@ class CCImageMaker
         self::MASTERCARD => "mastercard",
         self::POSTEPAY   => "postepay",
         self::UNIONPAY   => "unionpay",
-        self::VISA       => "visa"
+        self::VISA       => "visa",
+
+        // Cryptocurrencies
+        self::BTC        => "btc",
+        self::LTC        => "ltc",
+        self::BCH        => "bch",
+        self::BNB        => "bnb",
+        self::ETH        => "eth",
+        self::USDT       => "usdt",
+        self::USDC       => "usdc",
     ];
 
     /** Width/height of the icon files in src/icons, must be divisible by 4 */
