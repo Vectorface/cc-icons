@@ -9,7 +9,7 @@ class CCImageMaker
 {
     /** @var ImageManager */
     private $manager;
-    /** @var array */
+    /** @var int[] */
     private $processors;
     /** @var int */
     private $padding;
@@ -19,7 +19,7 @@ class CCImageMaker
     private $height;
     /** @var Image */
     private $img;
-    /** @var array */
+    /** @var array[] */
     private $layout;
 
     /* Give every CC icon an ID to reference */
@@ -134,27 +134,24 @@ class CCImageMaker
     }
 
     /**
-     * Specify the list of processors to be included in the image, can use either the processor's constant or a
-     * string representation.
-     * @param array $processors The new processors to be included
+     * Specify the list of processors to be included in the image,
+     * can use either the processor's constant or a string representation.
+     * 
+     * @param string[] $processors The new processors to be included
      * @return $this
      */
     public function withTypes(array $processors)
     {
-        // Remove unsupported entries (not referencing a valid constant or string)
-        $filtered_processors = array_filter($processors, function ($processor) {
-            return isset(self::$supported_cc_types[$processor])
-                || (is_string($processor) && isset(self::$cc_strings[strtoupper($processor)]));
-        });
+        $types = self::filterTypes($processors);
 
-        foreach ($filtered_processors as $i => $processor) {
+        // Convert strings to constants
+        foreach ($types as $i => $processor) {
             if (is_string($processor)) {
-                $filtered_processors[$i] = self::$cc_strings[strtoupper($processor)];
+                $types[$i] = self::$cc_strings[strtoupper($processor)];
             }
         }
 
-        // Discard processors if more than 6
-        $this->processors = array_slice($filtered_processors, 0, 6);
+        $this->processors = $types;
         return $this;
     }
 
@@ -220,6 +217,25 @@ class CCImageMaker
     {
         $this->makeImage();
         return (string)$this->img->encode('data-url');
+    }
+
+    /**
+     * Filters a list of processors to only include supported ones.
+     * Can be used to validate user inputs to reject unsupported types.
+     * 
+     * @param string[] $processors
+     * @return string[]
+     */
+    public static function filterTypes(array $processors)
+    {
+        // Remove unsupported entries (not referencing a valid constant or string)
+        $filtered_processors = array_filter($processors, function ($processor) {
+            return isset(self::$supported_cc_types[$processor])
+                || (is_string($processor) && isset(self::$cc_strings[strtoupper($processor)]));
+        });
+
+        // Discard processors if more than 6
+        return array_slice($filtered_processors, 0, 6);
     }
 
 
