@@ -136,7 +136,6 @@ class CCImageMaker
      * can use either the processor's constant or a string representation.
      * 
      * @param string[] $processors The new processors to be included
-     * @return $this
      */
     public function withTypes(array $processors): self
     {
@@ -156,7 +155,6 @@ class CCImageMaker
     /**
      * Set the amount of padding to place between icons - default is 10
      * @param int $new_padding The padding to place between icons
-     * @return $this
      */
     public function withPadding(int $new_padding): self
     {
@@ -168,7 +166,6 @@ class CCImageMaker
      * Set the size of the image that will be output
      * @param int $width The width of the image
      * @param int $height The height of the image
-     * @return $this
      */
     public function withSize(int $width, int $height): self
     {
@@ -187,7 +184,6 @@ class CCImageMaker
      *      5 => [2, 3]
      * ]
      * @param array $override The icon layouts to use
-     * @return $this
      */
     public function withLayout(array $override): self
     {
@@ -198,7 +194,6 @@ class CCImageMaker
     /**
      * Save the image to a specified location on disk
      * @param string $path The location to save the image
-     * @return $this
      */
     public function saveToDisk(string $path): self
     {
@@ -209,7 +204,6 @@ class CCImageMaker
 
     /**
      * Get the image as a RFC 2397 encoded string
-     * @return string
      */
     public function getDataUri(): string
     {
@@ -283,7 +277,6 @@ class CCImageMaker
      * @param array $processors List of processors to be included
      * @param int $row_height The height of the row
      * @param int $icon_size The size of icons to insert
-     * @return ImageInterface
      */
     private function makeRow(array $processors, int $row_height, int $icon_size): ImageInterface
     {
@@ -312,7 +305,6 @@ class CCImageMaker
     /**
      * Gets the pathname for a processor icon file
      * @param int $processor The processor id associated with the desired icon
-     * @return string
      */
     private function getIconPath(int $processor): string
     {
