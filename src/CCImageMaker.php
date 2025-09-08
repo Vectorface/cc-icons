@@ -2,25 +2,23 @@
 
 namespace Vectorface\CCIcons;
 
-use Intervention\Image\Image;
 use Intervention\Image\ImageManager;
+use Intervention\Image\Interfaces\ImageInterface;
 
 class CCImageMaker
 {
-    /** @var ImageManager */
-    private $manager;
+    private ImageManager $manager;
+
     /** @var int[] */
-    private $processors;
-    /** @var int */
-    private $padding;
-    /** @var int */
-    private $width;
-    /** @var int */
-    private $height;
-    /** @var Image */
-    private $img;
-    /** @var array[] */
-    private $layout;
+    private array $processors;
+
+    private int $padding;
+    private int $width;
+    private int $height;
+    private ImageInterface $img;
+
+    /** @var int[][] */
+    private array $layout;
 
     /* Give every CC icon an ID to reference */
     const AMEX = 1;
@@ -138,9 +136,8 @@ class CCImageMaker
      * can use either the processor's constant or a string representation.
      * 
      * @param string[] $processors The new processors to be included
-     * @return $this
      */
-    public function withTypes(array $processors)
+    public function withTypes(array $processors): self
     {
         $types = self::filterTypes($processors);
 
@@ -158,9 +155,8 @@ class CCImageMaker
     /**
      * Set the amount of padding to place between icons - default is 10
      * @param int $new_padding The padding to place between icons
-     * @return $this
      */
-    public function withPadding(int $new_padding)
+    public function withPadding(int $new_padding): self
     {
         $this->padding = $new_padding;
         return $this;
@@ -170,9 +166,8 @@ class CCImageMaker
      * Set the size of the image that will be output
      * @param int $width The width of the image
      * @param int $height The height of the image
-     * @return $this
      */
-    public function withSize(int $width, int $height)
+    public function withSize(int $width, int $height): self
     {
         $this->width = $width;
         $this->height = $height;
@@ -189,9 +184,8 @@ class CCImageMaker
      *      5 => [2, 3]
      * ]
      * @param array $override The icon layouts to use
-     * @return $this
      */
-    public function withLayout(array $override)
+    public function withLayout(array $override): self
     {
         $this->layout = array_replace($this->layout, $override);
         return $this;
@@ -200,9 +194,8 @@ class CCImageMaker
     /**
      * Save the image to a specified location on disk
      * @param string $path The location to save the image
-     * @return $this
      */
-    public function saveToDisk(string $path)
+    public function saveToDisk(string $path): self
     {
         $this->makeImage();
         $this->img->save($path);
@@ -211,9 +204,8 @@ class CCImageMaker
 
     /**
      * Get the image as a RFC 2397 encoded string
-     * @return string
      */
-    public function getDataUri()
+    public function getDataUri(): string
     {
         $this->makeImage();
         return $this->img
@@ -228,7 +220,7 @@ class CCImageMaker
      * @param string[] $processors
      * @return string[]
      */
-    public static function filterTypes(array $processors)
+    public static function filterTypes(array $processors): array
     {
         // Remove unsupported entries (not referencing a valid constant or string)
         $filtered_processors = array_filter($processors, function ($processor) {
@@ -244,7 +236,7 @@ class CCImageMaker
     /**
      * Make an image object containing specified credit card processors
      */
-    private function makeImage()
+    private function makeImage(): void
     {
         if (empty($this->processors)) {
             $this->processors = [self::MASTERCARD, self::VISA];
@@ -285,9 +277,8 @@ class CCImageMaker
      * @param array $processors List of processors to be included
      * @param int $row_height The height of the row
      * @param int $icon_size The size of icons to insert
-     * @return Image
      */
-    private function makeRow(array $processors, int $row_height, int $icon_size)
+    private function makeRow(array $processors, int $row_height, int $icon_size): ImageInterface
     {
         $row = $this->manager->create($this->width, $row_height);
 
@@ -314,9 +305,8 @@ class CCImageMaker
     /**
      * Gets the pathname for a processor icon file
      * @param int $processor The processor id associated with the desired icon
-     * @return string
      */
-    private function getIconPath(int $processor)
+    private function getIconPath(int $processor): string
     {
         return __DIR__ . '/icons/' . self::$supported_cc_types[$processor] . '.png';
     }
