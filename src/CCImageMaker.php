@@ -120,10 +120,10 @@ class CCImageMaker
     {
         if (extension_loaded('imagick') && class_exists(\Imagick::class) && !$useGd) {
             // Use Imagick by default if available
-            $this->manager = new ImageManager(['driver' => 'imagick']);
+            $this->manager = ImageManager::imagick();
         } else {
             // Fall back to GD if Imagick not present or otherwise specified
-            $this->manager = new ImageManager();
+            $this->manager = ImageManager::gd();
         }
 
         $this->width = 3 / 2 * self::ICON_SIZE;
@@ -216,7 +216,9 @@ class CCImageMaker
     public function getDataUri()
     {
         $this->makeImage();
-        return (string)$this->img->encode('data-url');
+        return $this->img
+            ->toPng()
+            ->toDataUri();
     }
 
     /**
@@ -248,7 +250,7 @@ class CCImageMaker
             $this->processors = [self::MASTERCARD, self::VISA];
         }
 
-        $this->img = $this->manager->canvas($this->width, $this->height);
+        $this->img = $this->manager->create($this->width, $this->height);
         // Use default layout if none specified
         $layout = $this->layout[count($this->processors)];
 
@@ -272,7 +274,7 @@ class CCImageMaker
                 round($icon_size)
             );
             // Offset from top by padding amount + $i * (row height + padding)
-            $this->img->insert($row, 'top-center', 0, round($top_padding + $i * ($this->padding + $row_height)));
+            $this->img->place($row, 'top-center', 0, round($top_padding + $i * ($this->padding + $row_height)));
             $processors_added += $count;
         }
     }
@@ -286,7 +288,7 @@ class CCImageMaker
      */
     private function makeRow(array $processors, int $row_height, int $icon_size)
     {
-        $row = $this->manager->canvas($this->width, $row_height);
+        $row = $this->manager->create($this->width, $row_height);
 
         // Divide available width evenly among icons as long as they are shorter than the row height
         $processor_count = count($processors);
@@ -295,10 +297,10 @@ class CCImageMaker
         $left_padding = ($this->width - ($processor_count * ($icon_size + $this->padding) - $this->padding)) / 2;
 
         foreach ($processors as $i => $processor) {
-            $processor_icon = $this->manager->make($this->getIconPath($processor));
-            $processor_icon->widen($icon_size);
+            $processor_icon = $this->manager->read($this->getIconPath($processor));
+            $processor_icon->scale(width: $icon_size);
             // Offset from left by padding amount + $i * (size of icon + padding)
-            $row->insert(
+            $row->place(
                 $processor_icon,
                 'left',
                 round($left_padding + $i * ($icon_size + $this->padding))
