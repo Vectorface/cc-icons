@@ -38,7 +38,7 @@ $special_images = [
         'types'   => ['VISA', 'MC', 'MAESTRO'],
         'size'    => [400, 200],
         'padding' => 10,
-        'layout'  => [3]
+        'layout'  => [3 => [3]]
     ],
 ];
 
