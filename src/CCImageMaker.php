@@ -120,10 +120,10 @@ class CCImageMaker
     {
         if (extension_loaded('imagick') && class_exists(\Imagick::class) && !$useGd) {
             // Use Imagick by default if available
-            $this->manager = new ImageManager(['driver' => 'imagick']);
+            $this->manager = ImageManager::imagick();
         } else {
             // Fall back to GD if Imagick not present or otherwise specified
-            $this->manager = new ImageManager();
+            $this->manager = ImageManager::gd();
         }
 
         $this->width = 3 / 2 * self::ICON_SIZE;
@@ -216,7 +216,9 @@ class CCImageMaker
     public function getDataUri()
     {
         $this->makeImage();
-        return (string)$this->img->encode('data-url');
+        return $this->img
+            ->toPng()
+            ->toDataUri();
     }
 
     /**
@@ -248,19 +250,20 @@ class CCImageMaker
             $this->processors = [self::MASTERCARD, self::VISA];
         }
 
-        $this->img = $this->manager->canvas($this->width, $this->height);
+        $this->img = $this->manager->create($this->width, $this->height);
         // Use default layout if none specified
         $layout = $this->layout[count($this->processors)];
 
         // Height is (total height - total padding) / number of rows
-        $row_height = ($this->height - (count($layout) - 1) * $this->padding) / count($layout);
+        $row_height = floor(($this->height - (count($layout) - 1) * $this->padding) / count($layout));
         // Padding is (total height - total padding - total row height) / 2
-        $top_padding = ($this->height - (count($layout) * ($row_height + $this->padding) - $this->padding)) / 2;
+        $top_padding = floor(($this->height - (count($layout) * ($row_height + $this->padding) - $this->padding)) / 2);
 
         // Get scaled icon size to fit all icons in a row size $this->width x $row_height
         $max_icons = max($layout);
+        $max_icon_width = floor(($this->width - ($max_icons - 1) * $this->padding) / $max_icons);
         $icon_size = min(
-            ($this->width - ($max_icons - 1) * $this->padding) / $max_icons,
+            $max_icon_width,
             $row_height
         );
 
@@ -269,10 +272,10 @@ class CCImageMaker
             $row = $this->makeRow(
                 array_slice($this->processors, $processors_added, $count),
                 $row_height,
-                round($icon_size)
+                $icon_size
             );
             // Offset from top by padding amount + $i * (row height + padding)
-            $this->img->insert($row, 'top-center', 0, round($top_padding + $i * ($this->padding + $row_height)));
+            $this->img->place($row, 'top-center', 0, $top_padding + $i * ($this->padding + $row_height));
             $processors_added += $count;
         }
     }
@@ -286,22 +289,22 @@ class CCImageMaker
      */
     private function makeRow(array $processors, int $row_height, int $icon_size)
     {
-        $row = $this->manager->canvas($this->width, $row_height);
+        $row = $this->manager->create($this->width, $row_height);
 
         // Divide available width evenly among icons as long as they are shorter than the row height
         $processor_count = count($processors);
 
         // Padding on either side of the row of icons
-        $left_padding = ($this->width - ($processor_count * ($icon_size + $this->padding) - $this->padding)) / 2;
+        $left_padding = floor(($this->width - ($processor_count * ($icon_size + $this->padding) - $this->padding)) / 2);
 
         foreach ($processors as $i => $processor) {
-            $processor_icon = $this->manager->make($this->getIconPath($processor));
-            $processor_icon->widen($icon_size);
+            $processor_icon = $this->manager->read($this->getIconPath($processor));
+            $processor_icon->scale(width: $icon_size);
             // Offset from left by padding amount + $i * (size of icon + padding)
-            $row->insert(
+            $row->place(
                 $processor_icon,
                 'left',
-                round($left_padding + $i * ($icon_size + $this->padding))
+                $left_padding + $i * ($icon_size + $this->padding)
             );
         }
 
