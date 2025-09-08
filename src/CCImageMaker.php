@@ -255,14 +255,15 @@ class CCImageMaker
         $layout = $this->layout[count($this->processors)];
 
         // Height is (total height - total padding) / number of rows
-        $row_height = ($this->height - (count($layout) - 1) * $this->padding) / count($layout);
+        $row_height = floor(($this->height - (count($layout) - 1) * $this->padding) / count($layout));
         // Padding is (total height - total padding - total row height) / 2
-        $top_padding = ($this->height - (count($layout) * ($row_height + $this->padding) - $this->padding)) / 2;
+        $top_padding = floor(($this->height - (count($layout) * ($row_height + $this->padding) - $this->padding)) / 2);
 
         // Get scaled icon size to fit all icons in a row size $this->width x $row_height
         $max_icons = max($layout);
+        $max_icon_width = floor(($this->width - ($max_icons - 1) * $this->padding) / $max_icons);
         $icon_size = min(
-            ($this->width - ($max_icons - 1) * $this->padding) / $max_icons,
+            $max_icon_width,
             $row_height
         );
 
@@ -271,10 +272,10 @@ class CCImageMaker
             $row = $this->makeRow(
                 array_slice($this->processors, $processors_added, $count),
                 $row_height,
-                round($icon_size)
+                $icon_size
             );
             // Offset from top by padding amount + $i * (row height + padding)
-            $this->img->place($row, 'top-center', 0, round($top_padding + $i * ($this->padding + $row_height)));
+            $this->img->place($row, 'top-center', 0, $top_padding + $i * ($this->padding + $row_height));
             $processors_added += $count;
         }
     }
@@ -294,7 +295,7 @@ class CCImageMaker
         $processor_count = count($processors);
 
         // Padding on either side of the row of icons
-        $left_padding = ($this->width - ($processor_count * ($icon_size + $this->padding) - $this->padding)) / 2;
+        $left_padding = floor(($this->width - ($processor_count * ($icon_size + $this->padding) - $this->padding)) / 2);
 
         foreach ($processors as $i => $processor) {
             $processor_icon = $this->manager->read($this->getIconPath($processor));
@@ -303,7 +304,7 @@ class CCImageMaker
             $row->place(
                 $processor_icon,
                 'left',
-                round($left_padding + $i * ($icon_size + $this->padding))
+                $left_padding + $i * ($icon_size + $this->padding)
             );
         }
 
